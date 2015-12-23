@@ -22,7 +22,8 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.5",
-        "saeven/circlical-po-editor": "dev-master"
+        "saeven/circlical-po-editor": "dev-master",
+        "saeven/circlical-twig-extractor": "dev-master"
     },
     "autoload": {
         "psr-0": {
