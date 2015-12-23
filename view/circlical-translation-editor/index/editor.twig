@@ -1,0 +1,218 @@
+<style type="text/css">
+
+    div.translation-group{
+        margin-top:50px;
+    }
+
+    div.keystring{
+        color: #acccdb;
+        padding:15px 10px 15px 10px;
+        background-color:#3C3F41;
+        margin-bottom:10px;
+    }
+
+    div.keystring:nth-of-type(1){
+        margin-top:0;
+    }
+
+    div.keystring.plural{
+        color:#B5A6F3;
+        background-color: rgba(181, 166, 243, 0.3);
+    }
+
+     div.keystring hr{
+        margin:10px;
+        border: 0;
+        height: 1px;
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+
+     }
+
+    div.form-group span.key{
+        color: #acccdb;
+    }
+
+    div.form-group i.fa-caret-right{
+        color: #3C3F41;
+    }
+
+    input.transfield{
+        background: repeating-linear-gradient(
+          -55deg,
+          #333333,
+          #333333 5px,
+          #3A3A3A 5px,
+          #3A3A3A 10px
+        );
+        color: #4cb0ff;
+    }
+
+    div.buffer{
+        width: 100%;
+        padding-left:20px;
+    }
+
+
+    label{
+        font-weight:normal;
+    }
+
+    div.tab-box{
+        padding-top:10px;
+    }
+
+    ul.module-tabs{
+        border-bottom-color: #444;
+    }
+
+    ul.module-tabs a{
+        border:none;
+        background:none;
+    }
+
+    ul.module-tabs a:hover{
+        border:none;
+        background:none;
+    }
+
+    ul.module-tabs li.active a{
+        border:none;
+        background:none;
+    }
+
+    ul.module-tabs li.active a:hover{
+        border:none;
+        background:none;
+    }
+
+    div.editor_actions{
+        position:fixed;
+        height:50px;
+        width:100%;
+        bottom:0;
+        left:0;
+        background-color: #111;
+        z-index:55555;
+        padding:5px;
+        border-top:1px solid black;
+    }
+
+    div.trans_tabs{
+        min-height:650px;
+    }
+
+
+</style>
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs module-tabs" role="tablist">
+{% for module, pofile in module_entries %}
+    <li role="presentation"><a href="#{{ module }}" role="tab" data-toggle="tab"><i class="fa fa-file-code-o"></i> {{ module }}</a></li>
+{% endfor %}
+</ul>
+
+
+<div class="tab-content trans_tabs">
+{% for module, blocks in module_entries %}
+    <!-- Tab panes -->
+    <div role="tabpanel" class="tab-pane fade module-translations" id="{{ module }}">
+        <div class="tab-box">
+
+        {% for key, block in blocks %}
+            <div class="translation-group" data-key="{{ block.getKey() }}">
+
+                {# decorate the display if it is plural #}
+
+                {% if block.getMsgidPlural() %}
+
+                    <div class="col-xs-12 keystring plural">
+                        {{ block.getMsgid()|join('<i class="fa fa-paragraph"></i><br/>')|raw }}
+                        <hr/>
+                        <i class="fa fa-plus"></i> {{ block.getMsgidPlural()|join('<i class="fa fa-paragraph"></i><br/>')|raw }}
+                    </div>
+
+                    {# each plural form can be an array #}
+                    {% for plural_form, lines in block.getMsgstrPlural() %}
+                    <div class="form-group plural">
+                        <label>msgstr[{{ plural_form }}]</label>
+                        {% for s in lines %}
+                        <div class="buffer">
+                            <input class="form-control transfield" type="text" data-plural="1" data-id="{{ plural_form }}" value="{{ s }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+
+
+                {% else %}
+
+                    <div class="col-xs-12 keystring">
+                        {{ block.getMsgid()|join('<i class="fa fa-paragraph"></i><br/>')|raw }}
+                    </div>
+
+                    {% for id, msg in block.getMsgid() %}
+                        <div class="form-group singular">
+                            <label><span class="key">{{ id }}</span> <i class="fa fa-caret-right"></i>
+                                {{ msg }}
+                            </label>
+                            <div class="buffer">
+                                <input class="form-control transfield" type="text" data-plural="0" data-id="{{ id }}" value="{{ block.getMsgstr()[id] }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+        {% endfor %}
+
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+<div class="editor_actions">
+    <button class="btn btn-success pull-right" id="save"><i class="fa fa-hdd-o"></i> Save Translations</button>
+</div>
+
+<script type="text/javascript">
+
+    $("button#save").click( function(){
+
+        var translations = {};
+
+        $(".module-translations").each( function(){
+            var module = $(this).attr('id'),
+                parts  = {};
+
+            $(this).find(".translation-group").each( function(){
+                var $t = $(this),
+                    key = $t.attr('data-key'),
+                    strings = { singular: [], plural: {} };
+
+                $(this).find('.singular').each( function(){
+                    $(this).find( 'input.transfield').each( function(){
+                        strings['singular'].push( $(this).val() );
+                    });
+                });
+
+                $(this).find('.plural').each( function(){
+                    $(this).find( 'input.transfield').each( function(){
+                        strings['plural'][$(this).attr('data-id')] = $(this).val();
+                    });
+                });
+
+                parts[key] = strings;
+            });
+
+            translations[module] = parts;
+        });
+
+        $.ajax('/translate/save/' + locale, {
+            data: JSON.stringify( translations ),
+            type: 'POST',
+            processData: false,
+            contentType: 'application/json'
+        });
+    });
+
+</script>

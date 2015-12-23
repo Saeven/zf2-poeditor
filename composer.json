@@ -1,0 +1,37 @@
+{
+    "name":         "saeven/zf2-poeditor",
+    "description":  "Front end to gettext that lets you translate your PHP and Twig files in a snap",
+    "type":         "library",
+    "license":      "MIT",
+    "homepage":     "https://github.com/Saeven/zf2-poeditor",
+    "keywords": [
+        "po",
+        "edit",
+        "gettext",
+        "twig",
+        "php"
+    ],
+    "authors": [
+        {
+            "name":      "Alexandre Lemaire",
+            "email":     "alemaire@circlical.com",
+            "homepage":  "http://circlical.com/",
+            "role":      "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5",
+        "saeven/circlical-po-editor": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "CirclicalTranslationEditor\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1-dev"
+        }
+    }
+}

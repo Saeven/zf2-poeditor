@@ -1,0 +1,197 @@
+<style type="text/css">
+
+    span.filename{
+        font-family: "Helvetica Neue";
+        font-size:0.9em;
+        line-height:22px;
+    }
+    
+    body {
+        background: #2B2B2B;
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+
+    div.filediv{
+        margin:3px;
+    }
+
+    div.filediv span.input-group-addon{
+        background-color: #515658;
+        border-color: #333;
+    }
+
+    div.filediv span.form-control {
+        background-color: #313335;
+        color:#E8BF6A;
+        border-color: #333;
+    }
+
+    h2{
+        color:#A5C261;
+        font-size:1.4em;
+        font-weight:normal;
+        margin-bottom:0;
+    }
+
+    h3{
+        color:#6897BB;
+        font-size:1.2em;
+        font-weight:normal;
+    }
+
+    .nav-tabs{
+        border-color:black;
+    }
+
+    .nav-tabs > li > a {
+
+        border-radius:0;
+    }
+
+    label{
+        color:white;
+    }
+
+    .nav-tabs > li.active > a {
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzUxNTY1OCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM1MTU2NTgiIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+        background: -moz-linear-gradient(top,  rgba(81,86,88,1) 0%, rgba(81,86,88,0) 100%);
+        background: -webkit-linear-gradient(top,  rgba(81,86,88,1) 0%,rgba(81,86,88,0) 100%);
+        background: linear-gradient(to bottom,  rgba(81,86,88,1) 0%,rgba(81,86,88,0) 100%);
+        color: white;
+        border-color:black;
+        border-bottom-color:#2B2B2B;
+    }
+
+</style>
+
+    <div class="container" style="margin-bottom:50px;margin-top:15px;">
+
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#files" role="tab" data-toggle="tab"><i class="fa fa-magic"></i> Source Files</a></li>
+        <li role="presentation"><a href="#translations" role="tab" data-toggle="tab"><i class="fa fa-align-left"></i> Translations</a></li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade in active" id="files">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h2>Source Files <small style="font-size:0.8em;font-weight:100;color:#CC7832;padding-left:10px;"><i class="fa fa-check-square"></i> the files that should be translated</small></h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12" style="padding-top:25px;">
+                            <h3>Twig Files</h3>
+                            {% for line in twig_files %}
+                                <div class="filediv">
+                                    <div class="input-group">
+                                      <span class="input-group-addon">
+                                        <input type="checkbox" data-type="twig" data-file="{{ line }}" {% if line in checked['twig'] %}checked{% endif %}>
+                                      </span>
+                                        <span type="text" class="form-control filename">{{ line }}</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No TWIG files discovered
+                                </div>
+                            {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12" style="padding-top:25px;">
+                            <h3>PHP Files</h3>
+                            {% for line in php_files %}
+                                <div class="filediv">
+                                    <div class="input-group">
+                                      <span class="input-group-addon">
+                                        <input type="checkbox" data-type="php" data-file="{{ line }}" {% if line in checked['php'] %}checked{% endif %}>
+                                      </span>
+                                        <span type="text" class="form-control filename">{{ line }}</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No PHP files discovered
+                                </div>
+                            {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="translations">
+            <div class="col-xs-12" style="padding-bottom:10px;">
+                <h2>Translations</h2>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label for="locale_select">Select a locale</label>
+                    <select id="locale_select" class="form-control">
+                        <option value="">Please select...</option>
+                        {% for x in locales %}
+                        <option value="{{ x }}">{{ x }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</button>
+                </div>
+            </div>
+            <div class="col-xs-12" style="padding-bottom:10px;">
+                <h2>Modules</h2>
+            </div>
+            <div id="string_list">
+
+
+            </div>
+        </div>
+
+      </div>
+
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    var locale = '';
+    var $string_list = $("#string_list");
+
+    $("input[type='checkbox']").change( function( t ){
+        var $t = $(this),
+            file_list = [];
+
+        $("input[data-type='" + $t.attr('data-type') + "']:checkbox").prop('disabled',true);
+
+        $("input[data-type='" + $t.attr('data-type') + "']:checkbox:checked").each( function( s ){
+            file_list.push( $(this).attr('data-file') );
+        });
+
+        $.post( '/translate/set', { files: file_list, type: $t.attr('data-type') }, function( t ){
+            // show something
+        },'json').done( function(){
+            $("input[data-type='" + $t.attr('data-type') + "']:checkbox").prop('disabled',false);
+        })
+    });
+
+    $("select#locale_select").change( function( s ){
+        $select = $(this);
+        locale = $select.val();
+        $.getJSON( '/translate/compile', { locale: $select.val() }, function( j ){
+            if(j.success){
+                $string_list.load( '/translate/get-editor', { locale: $select.val() } );
+            }
+            else{
+                $string_list.html("<h5 class='text-danger'>Yikes! Something blew up.</h5><div class='alert alert-danger' style='overflow:hidden;font-size:10px;'>" + j.message + "</div>");
+            }
+        });
+
+    })
+
+</script>
