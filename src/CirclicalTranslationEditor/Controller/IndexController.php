@@ -237,7 +237,9 @@ class IndexController extends AbstractActionController
         }
         catch( \Exception $x )
         {
+	        $response['success'] = false;
 			$response['message'] = $x->getMessage();
+	        $response['type'] = get_class( $x );
         }
 
         return new JsonModel( $response );
