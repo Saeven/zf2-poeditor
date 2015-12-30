@@ -106,45 +106,53 @@ class IndexController extends AbstractActionController
 
         try
         {
-            $locale         = preg_replace( '/[^a-zA-Z_]/', "", $this->params()->fromQuery( 'locale' ) );
+            $locale = preg_replace( '/[^a-zA-Z_]/', "", $this->params()->fromQuery( 'locale' ) );
 
-	        if( !$locale )
-                throw new \Exception( "Locale is required!" );
-
-            $config         = $this->getServiceLocator()->get( 'config' );
-	        $config         = $config['circlical']['translation_editor'];
-            $xgettext       = $config['xgettext'];
-            $msgcat         = $config['msgcat'];
-	        $backup_dir     = $config['backup_dir'];
-	        $cache_dir      = $config['cache_dir'];
-
-
-	        // pull the files in the database
-	        $files          = $this->getSelectedFiles();
-	        $twig_file_list = array_map( function ( $str ){
-                return sprintf( '"' . 'module/' . '%s"', trim( $str ) );
-            }, $files['twig'] ?: [] );
-
-            $php_file_list  = array_map( function ( $str ){
-                return sprintf( '"' . 'module/' . '%s"', trim( $str ) );
-            }, $files['php'] ?: [] );
-
-            $modules = [ ];
-
-            // group twig files by module
-            foreach( $twig_file_list as $f )
+            if( !$locale )
             {
-                preg_match( '#^"module/([A-Za-z]*?)/#us', $f, $matches );
-                if( $matches )
-                    $modules[$matches[1]]['twig'][] = $f;
+                throw new \Exception( "Locale is required!" );
             }
 
-            // group php files by module
-            foreach( $php_file_list as $f )
+            $config     = $this->getServiceLocator()->get( 'config' );
+            $config     = $config['circlical']['translation_editor'];
+            $xgettext   = $config['xgettext'];
+            $msgcat     = $config['msgcat'];
+            $backup_dir = $config['backup_dir'];
+            $cache_dir  = $config['cache_dir'];
+
+
+            // pull the files in the database
+            $files = $this->getSelectedFiles();
+            $modules = [];
+
+            if( !empty($files['twig']) )
             {
-                preg_match( '#^"module/([A-Za-z]*?)/#us', $f, $matches );
-                if( $matches )
-                    $modules[$matches[1]]['php'][] = $f;
+                $twig_file_list = array_map( function ( $str ){
+                    return sprintf( '"' . 'module/' . '%s"', trim( $str ) );
+                }, $files['twig'] );
+
+                // group twig files by module
+                foreach( $twig_file_list as $f )
+                {
+                    preg_match( '#^"module/([A-Za-z]*?)/#us', $f, $matches );
+                    if( $matches )
+                        $modules[$matches[1]]['twig'][] = $f;
+                }
+            }
+
+            if( !empty( $files['php'] ) )
+            {
+                $php_file_list = array_map( function ( $str ){
+                    return sprintf( '"' . 'module/' . '%s"', trim( $str ) );
+                }, $files['php'] );
+
+                // group php files by module
+                foreach( $php_file_list as $f )
+                {
+                    preg_match( '#^"module/([A-Za-z]*?)/#us', $f, $matches );
+                    if( $matches )
+                        $modules[$matches[1]]['php'][] = $f;
+                }
             }
 
             // first, grind the new files
