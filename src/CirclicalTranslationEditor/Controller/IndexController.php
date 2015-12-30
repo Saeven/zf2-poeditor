@@ -123,11 +123,11 @@ class IndexController extends AbstractActionController
 	        $files          = $this->getSelectedFiles();
 	        $twig_file_list = array_map( function ( $str ){
                 return sprintf( '"' . 'module/' . '%s"', trim( $str ) );
-            }, $files['twig'] );
+            }, $files['twig'] ?: [] );
 
             $php_file_list  = array_map( function ( $str ){
                 return sprintf( '"' . 'module/' . '%s"', trim( $str ) );
-            }, $files['php'] );
+            }, $files['php'] ?: [] );
 
             $modules = [ ];
 
