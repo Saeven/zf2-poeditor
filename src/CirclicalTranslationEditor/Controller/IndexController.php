@@ -173,7 +173,7 @@ class IndexController extends AbstractActionController
 			            '-o "' . $module_twig_pot . '" ' .
 			            '--from-code=UTF-8 -ktranslate -L PHP --exec ' . $xgettext . ' ' .
 			            (
-				            !empty( $config['stub_functions'] ) ? "--functions " . implode(",", $config['stub_functions']) : ''
+				            !empty( $config['stub_functions'] ) ? "--functions " . implode(",", $config['stub_functions']) . ' '  : ''
 			            ) .
 			            '--files ' . implode( " ", $list['twig'] );
 
