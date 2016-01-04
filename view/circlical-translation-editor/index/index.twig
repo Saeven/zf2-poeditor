@@ -47,15 +47,22 @@
     }
 
     .nav-tabs > li > a {
-
         border-radius:0;
+    }
+
+    .nav-tabs > li > a:hover {
+        background-color: #2B2B2B;
+        border:1px solid transparent;
+        border-bottom:1px solid black;
+        color: #3b98d6;
+
     }
 
     label{
         color:white;
     }
 
-    .nav-tabs > li.active > a {
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover {
         background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzUxNTY1OCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM1MTU2NTgiIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
         background: -moz-linear-gradient(top,  rgba(81,86,88,1) 0%, rgba(81,86,88,0) 100%);
         background: -webkit-linear-gradient(top,  rgba(81,86,88,1) 0%,rgba(81,86,88,0) 100%);
@@ -63,6 +70,12 @@
         color: white;
         border-color:black;
         border-bottom-color:#2B2B2B;
+    }
+
+    div.well{
+        background-color: #313335;
+        color:#BABABA;
+        border-color: #313335;
     }
 
 </style>
@@ -81,46 +94,67 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12">
-                        <h2>Source Files <small style="font-size:0.8em;font-weight:100;color:#CC7832;padding-left:10px;"><i class="fa fa-check-square"></i> the files that should be translated</small></h2>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12" style="padding-top:25px;">
-                            <h3>Twig Files</h3>
-                            {% for line in twig_files %}
-                                <div class="filediv">
-                                    <div class="input-group">
-                                      <span class="input-group-addon">
-                                        <input type="checkbox" data-type="twig" data-file="{{ line }}" {% if line in checked['twig'] %}checked{% endif %}>
-                                      </span>
-                                        <span type="text" class="form-control filename">{{ line }}</span>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="alert alert-info">
-                                    No TWIG files discovered
-                                </div>
-                            {% endfor %}
-                    </div>
-                </div>
+                        <div class="form-group">
+                            <h2>Scan Mode <small style="font-size:0.8em;font-weight:100;color:#CC7832;padding-left:10px;"> how will files be selected for translation?</small></h2>
+                        </div>
 
-                <div class="row">
+                        <div class="btn-group" data-toggle="buttons">
+                          <label class="btn btn-primary {% if scan_type == 'scan_all' %}active{% endif %}">
+                            <input type="radio" name="scan_mode" id="scan_all" autocomplete="off" {% if scan_type == 'scan_all' %}checked{% endif %}> Automatic
+                          </label>
+                          <label class="btn btn-primary {% if scan_type == 'scan_selective' %}active{% endif %}">
+                            <input type="radio" name="scan_mode" id="scan_selective" autocomplete="off" {% if scan_type == 'scan_selective' %}checked{% endif %}> Manual
+                          </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="content_automatic" {% if scan_type != 'scan_all' %}style="display:none;"{% endif %}>
+                    <div class="col-xs-12">
+                        <div class="well" style="margin-top:15px;">
+                            In <b>automatic mode</b>, the system will parse *.php and *.twig for strings it can translate.
+                        </div>
+                        <em style="color:white;">You can head on over to the "Translations" tab right away...</em>
+                    </div>
+                </div>
+                <div class="row" id="content_selective" {% if scan_type != 'scan_selective' %}style="display:none;"{% endif %}>
+                    <div class="col-xs-12">
+                        <div class="well" style="margin-top:15px;">
+                            In <b>manual mode</b>, you must select the files whose contents should be parsed.
+                        </div>
+                    </div>
+                    <div class="col-xs-12" style="padding-top:0;">
+                        <h3>Twig Files</h3>
+                        {% for line in twig_files %}
+                            <div class="filediv">
+                                <div class="input-group">
+                                  <span class="input-group-addon">
+                                    <input type="checkbox" data-type="twig" data-file="{{ line }}" {% if line in checked['twig'] %}checked{% endif %}>
+                                  </span>
+                                    <span type="text" class="form-control filename">{{ line }}</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                No TWIG files discovered
+                            </div>
+                        {% endfor %}
+                    </div>
                     <div class="col-xs-12" style="padding-top:25px;">
-                            <h3>PHP Files</h3>
-                            {% for line in php_files %}
-                                <div class="filediv">
-                                    <div class="input-group">
-                                      <span class="input-group-addon">
-                                        <input type="checkbox" data-type="php" data-file="{{ line }}" {% if line in checked['php'] %}checked{% endif %}>
-                                      </span>
-                                        <span type="text" class="form-control filename">{{ line }}</span>
-                                    </div>
+                        <h3>PHP Files</h3>
+                        {% for line in php_files %}
+                            <div class="filediv">
+                                <div class="input-group">
+                                  <span class="input-group-addon">
+                                    <input type="checkbox" data-type="php" data-file="{{ line }}" {% if line in checked['php'] %}checked{% endif %}>
+                                  </span>
+                                    <span type="text" class="form-control filename">{{ line }}</span>
                                 </div>
-                            {% else %}
-                                <div class="alert alert-info">
-                                    No PHP files discovered
-                                </div>
-                            {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                No PHP files discovered
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -141,7 +175,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-primary"><i class="fa fa-refresh"></i> Refresh</button>
+                    <button class="btn btn-primary" id="refresh_locale"><i class="fa fa-refresh"></i> Refresh</button>
                 </div>
             </div>
             <div class="col-xs-12" style="padding-bottom:10px;">
@@ -181,17 +215,38 @@
     });
 
     $("select#locale_select").change( function( s ){
-        $select = $(this);
-        locale = $select.val();
-        $.getJSON( '/translate/compile', { locale: $select.val() }, function( j ){
+        loadLocale( $(this).val() );
+    });
+
+    $("#refresh_locale").click( function(){
+        $select = $("select#locale_select");
+        loadLocale( $select.val() );
+    });
+
+    function loadLocale( lc ){
+        $.getJSON( '/translate/compile', { locale: lc }, function( j ){
             if(j.success){
-                $string_list.load( '/translate/get-editor', { locale: $select.val() } );
+                $string_list.load( '/translate/get-editor', { locale: lc } );
             }
             else{
                 $string_list.html("<h5 class='text-danger'>Yikes! Something blew up.</h5><div class='alert alert-danger' style='overflow:hidden;font-size:10px;'>" + j.message + "</div>");
             }
         });
+    }
 
+    $("input[name='scan_mode']").change(function(){
+        var scan_value = $("input[name='scan_mode']:checked").attr('id');
+        $.getJSON('/translate/set-scan-type',{type: scan_value});
+        if( scan_value == 'scan_selective' )
+        {
+            $("#content_automatic").hide();
+            $("#content_selective").show();
+        }
+        else
+        {
+            $("#content_selective").hide();
+            $("#content_automatic").show();
+        }
     })
 
 </script>

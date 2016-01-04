@@ -8,9 +8,131 @@ use Zend\Db\Sql\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
+use Zend\Config\Reader\Ini as ConfigReader;
+use Zend\Config\Writer\Ini as ConfigWriter;
+use Zend\Config\Config;
 
 class IndexController extends AbstractActionController
 {
+
+    const SCAN_SELECTIVE = 'scan_selective';
+    const SCAN_ALL = 'scan_all';
+
+    /**
+     * Save a setting into translation.ini
+     * @param $section
+     * @param $subsection
+     * @param $value
+     */
+    public function setConfig( $section, $subsection, $value )
+    {
+        $cfg = $this->getConfig();
+        if( !isset( $cfg->$section ) )
+            $cfg->$section = [];
+
+        if( $subsection )
+            $cfg->$section->$subsection = $value;
+        else
+            $cfg->$section = $value;
+
+        $config = $this->getServiceLocator()->get( 'config' );
+        $config = $config['circlical']['translation_editor'];
+        $cache_dir = $config['cache_dir'];
+        $translator_config = $cache_dir . '/translator.ini';
+
+        if( !file_exists( $translator_config ) )
+        {
+            @mkdir( dirname( $translator_config ), 0755, true );
+            @touch( $translator_config );
+        }
+
+        $writer = new ConfigWriter();
+        $writer->toFile( $translator_config, $cfg, false );
+    }
+
+    /**
+     * Fetch the entire translation.ini, or a part
+     * @return Config
+     */
+    private function getConfig( $section = null, $setting = null )
+    {
+        $config = $this->getServiceLocator()->get( 'config' );
+        $config = $config['circlical']['translation_editor'];
+        $cache_dir = $config['cache_dir'];
+        $translator_config = $cache_dir . '/translator.ini';
+        $params = [];
+        if( file_exists( $translator_config ) )
+        {
+            $reader    = new ConfigReader();
+            $params    = $reader->fromFile( $translator_config );
+        }
+
+        $config = new Config($params,true);
+        if( $section )
+        {
+            if( isset( $config->$section ) )
+            {
+                if( $setting )
+                {
+                    return isset($config->$section->$setting) ? $config->$section->$setting : null;
+                }
+                else
+                {
+                    return $config->$section;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+        return $config;
+    }
+
+
+    /**
+     * Convenience method to help with code readability -- gets the type of scan, scan_selective or scan_all
+     * @return string
+     */
+    private function getScanType()
+    {
+        $type = $this->getConfig('general','scan_type');
+        return $type ?: 'all';
+    }
+
+    private function listTwigFiles()
+    {
+        $cmd = 'find ' . getcwd() . '/module -name "*.twig"';
+        $ret = shell_exec( $cmd );
+        $ret = preg_split('/$\R?^/m', $ret );
+        $ret = array_map( function( $x ){
+            return str_replace( getcwd() . '/module/', '', $x );
+        }, $ret );
+        return $ret;
+    }
+
+    private function listPhpFiles()
+    {
+        $cmd = 'find ' . getcwd() . '/module -name "*.php"';
+        $ret = shell_exec( $cmd );
+        $ret = preg_split('/$\R?^/m', $ret );
+        $ret = array_map( function( $x ){
+            return str_replace( getcwd() . '/module/', '', $x );
+        }, $ret );
+        return $ret;
+    }
+
+    private function listLocales()
+    {
+        $cmd = "find " . getcwd() . "/module/*/language/* -maxdepth 0 -type d";
+        $ret = shell_exec($cmd);
+        $locales = array_map( function( $x ){
+            return trim( substr( $x, strrpos( $x, DIRECTORY_SEPARATOR ) + 1 ) );
+        }, preg_split('/$\R?^/m', $ret ) );
+        $locales = array_unique( $locales );
+        return $locales;
+    }
+
     /**
      * Discover all translatable files, load them into view with checkboxes
      * @return ViewModel
@@ -19,73 +141,45 @@ class IndexController extends AbstractActionController
     {
         $vm = new ViewModel();
 
-        // find all twig files
-        $cmd = 'find ' . getcwd() . '/module -name "*.twig"';
-        $ret = shell_exec( $cmd );
-        $ret = preg_split('/$\R?^/m', $ret );
-        $ret = array_map( function( $x ){
-            return str_replace( getcwd() . '/module/', '', $x );
-        }, $ret );
-        $vm->setVariable( 'twig_files', $ret );
-
-
-
-         // find all php files
-        $cmd = 'find ' . getcwd() . '/module -name "*.php"';
-        $ret = shell_exec( $cmd );
-        $ret = preg_split('/$\R?^/m', $ret );
-        $ret = array_map( function( $x ){
-            return str_replace( getcwd() . '/module/', '', $x );
-        }, $ret );
-        $vm->setVariable( 'php_files', $ret );
-
-
-        $vm->setVariable( 'checked', $this->getSelectedFiles() );
-
-        $cmd = "find " . getcwd() . "/module/*/language/* -maxdepth 0 -type d";
-        $ret = shell_exec($cmd);
-        $locales = array_map( function( $x ){
-            return trim( substr( $x, strrpos( $x, DIRECTORY_SEPARATOR ) + 1 ) );
-        }, preg_split('/$\R?^/m', $ret ) );
-        $locales = array_unique( $locales );
-        $vm->setVariable( 'locales', $locales );
+        $vm->setVariables([
+          'twig_files' => $this->listTwigFiles(),
+          'php_files' => $this->listPhpFiles(),
+          'locales' => $this->listLocales(),
+          'scan_type' => $this->getScanType(),
+          'checked' => $this->getSelectedFiles(true),
+        ]);
 
         return $vm;
     }
 
+
+    /**
+     * Called when the automatic/manual buttons are toggled on the main view, this stores into a flatfile, the
+     * scan type that was selected.  It's later used at the compile step.
+     */
+    public function setScanTypeAction()
+    {
+        $this->setConfig( 'general', 'scan_type', $this->params()->fromQuery('type') );
+        return new JsonModel(['success'=>true]);
+    }
+
+
     /**
      * Set a particular file for translation: "Yes, I would like to translate ..."
+     * Receives 'type' and 'files[]'
+     *
      * @return JsonModel
      */
     public function setAction()
     {
         $response = [ 'success' => false ];
         $sm = $this->getServiceLocator();
-        $config = $sm->get('config');
 
         try
         {
-            $DBM = $this->getDatabase();
-            $DBA = $DBM->getAdapter();
-
-            // delete old
-            $del = $DBM->delete( 'dev_translation_files' )
-                ->where( [
-                    'type' => $this->params()->fromPost( 'type' ),
-                ] );
-
-            $str = $DBM->buildSqlString( $del, $DBA );
-            $DBA->query( $str, Adapter::QUERY_MODE_EXECUTE );
-
-            // insert new
-            $ins = $DBM->insert( 'dev_translation_files' )
-                ->values( [
-                    'type'             => $this->params()->fromPost( 'type' ),
-                    'serialized_files' => json_encode( $this->params()->fromPost( 'files' ) ),
-                ] );
-
-            $str = $DBM->buildSqlString( $ins, $DBA );
-            $DBA->query( $str, Adapter::QUERY_MODE_EXECUTE );
+            $params = $this->params();
+            $type   = $params->fromPost( 'type' );
+            $this->setConfig( $type, null, $params->fromPost( 'files' ) );
             $response['success'] = true;
         }
         catch( \Exception $x )
@@ -353,44 +447,24 @@ class IndexController extends AbstractActionController
     }
 
     /**
-     * Check the database for selected files
+     * Get the list of files that should be processed based on scan type
+     * @param bool $force_manual Get the manually-picked list only
      * @return array
      */
-    private function getSelectedFiles()
+    private function getSelectedFiles( $force_manual = false )
     {
-        $DBM = $this->getDatabase();
-        $DBA = $DBM->getAdapter();
-        $sel = $DBM->select('dev_translation_files');
-        $str = $DBM->buildSqlString( $sel, $DBA );
-        $res = $DBA->query( $str, Adapter::QUERY_MODE_EXECUTE );
-
-        $checked = [];
-        foreach( $res as $r ){
-            $files = json_decode( $r->serialized_files );
-            foreach( $files as $f ){
-                $checked[$r->type][] = $f;
-            }
-        }
-        return $checked;
-    }
-
-    /**
-     * Fetch a database
-     * @return Sql
-     */
-    private function getDatabase(){
-        $sm = $this->getServiceLocator();
-	    $config = $sm->get('config');
-
-        if( !empty($config['circlical']['translation_editor']['database_handle']) )
+        $cfg = $this->getConfig();
+        if( $force_manual || $cfg->general->scan_type == self::SCAN_SELECTIVE )
         {
-            $database = $sm->get( $config['circlical']['translation_editor']['database_handle'] );
+            return [
+                'php'  => !empty($cfg->php) ? $cfg->php->toArray() : [ ],
+                'twig' => !empty($cfg->twig) ? $cfg->twig->toArray() : [ ],
+            ];
         }
-        else
-        {
-            $database = $sm->get( 'Zend\Db\Adapter\Adapter' );
-        }
-        return new Sql( $database );
-    }
 
+        return [
+            'php' => $this->listPhpFiles(),
+            'twig' => $this->listTwigFiles(),
+        ];
+    }
 }
