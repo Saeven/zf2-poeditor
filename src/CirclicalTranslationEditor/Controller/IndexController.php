@@ -144,6 +144,7 @@ class IndexController extends AbstractActionController
         {
             $config['guard']();
         }
+        parent::onDispatch( $e );
     }
 
 
