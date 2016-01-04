@@ -416,6 +416,10 @@ class IndexController extends AbstractActionController
         $response['success'] = false;
         $locale = preg_replace('/[^a-zA-Z_]/',"", $this->params()->fromRoute('locale') );
 
+        $config = $this->getServiceLocator()->get( 'config' );
+        $config = $config['circlical']['translation_editor'];
+        $msgfmt = $config['msgfmt'];
+
         try
         {
             if( !$this->getRequest()->isPost() )
@@ -429,6 +433,8 @@ class IndexController extends AbstractActionController
             foreach( array_keys( $json ) as $module )
             {
                 $module_po_file = getcwd() . '/module/' . $module . '/language/' . $locale . '/LC_MESSAGES/default.po';
+                $module_mo_file = getcwd() . '/module/' . $module . '/language/' . $locale . '/LC_MESSAGES/default.mo';
+
                 $parser = new PoEditor( $module_po_file );
                 $parser->parse();
 
@@ -450,6 +456,7 @@ class IndexController extends AbstractActionController
                 }
 
                 file_put_contents( $module_po_file, $parser->compile() );
+                shell_exec( $msgfmt . ' ' . $module_po_file . ' ' . $module_mo_file );
                 $response['success'] = true;
             }
 

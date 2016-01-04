@@ -15,6 +15,12 @@ return [
              */
             'msgcat' => '/usr/local/bin/msgcat',
 
+
+            /*
+             * The path to msgfmt on your local machine. Make sure this is installed, or it won't work
+             */
+            'msgfmt' => '/usr/local/bin/msgfmt',
+
             /*
              * The folder where existing po files are backed up, just in case
              */
