@@ -269,6 +269,9 @@ class IndexController extends AbstractActionController
 			            (
 				            !empty( $config['stub_functions'] ) ? "--functions " . implode(",", $config['stub_functions']) . ' '  : ''
 			            ) .
+                        (
+				            !empty( $config['stub_filters'] ) ? "--filters " . implode(",", $config['stub_filters']) . ' '  : ''
+			            ) .
 			            '--files ' . implode( " ", $list['twig'] );
 
 		            $ret = shell_exec( $cmd );
