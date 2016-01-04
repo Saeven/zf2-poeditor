@@ -23,7 +23,10 @@
     "require": {
         "php": ">=5.5",
         "saeven/circlical-po-editor": "dev-master",
-        "saeven/circlical-twig-extractor": "dev-master"
+        "saeven/circlical-twig-extractor": "dev-master",
+        "zendframework/zend-mvc": "@stable",
+        "zendframework/zend-config": "@stable",
+        "zendframework/zend-view": "@stable"
     },
     "autoload": {
         "psr-0": {

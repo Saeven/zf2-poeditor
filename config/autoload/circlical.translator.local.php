@@ -43,6 +43,18 @@ return [
             'stub_filters' => [
                 'localizedcurrency',
             ],
+
+
+            /*
+             * You can configure a guard function to prevent this from being used in prod environments
+             */
+//            'guard' => function(){
+//	            if( getenv('APPLICATION_ENV') != 'development' ){
+//	                header( "Location /index.php" );
+//		            exit;
+//	            }
+//            },
+
         ],
     ],
 ];

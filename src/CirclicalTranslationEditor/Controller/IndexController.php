@@ -3,14 +3,14 @@
 namespace CirclicalTranslationEditor\Controller;
 
 use Circlical\PoEditor\PoEditor;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Sql;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zend\Config\Reader\Ini as ConfigReader;
 use Zend\Config\Writer\Ini as ConfigWriter;
 use Zend\Config\Config;
+use Zend\Mvc\MvcEvent;
+
 
 class IndexController extends AbstractActionController
 {
@@ -133,6 +133,20 @@ class IndexController extends AbstractActionController
         return $locales;
     }
 
+
+    /**
+     * Execute a guard function, gives you the opportunity to bail or die if conditions aren't met
+     */
+    public function onDispatch(MvcEvent $e){
+        $config     = $this->getServiceLocator()->get( 'config' );
+        $config     = $config['circlical']['translation_editor'];
+        if( !empty( $config['guard'] ) && is_callable( $config['guard']) )
+        {
+            $config['guard']();
+        }
+    }
+
+
     /**
      * Discover all translatable files, load them into view with checkboxes
      * @return ViewModel
@@ -140,7 +154,6 @@ class IndexController extends AbstractActionController
     public function indexAction()
     {
         $vm = new ViewModel();
-
         $vm->setVariables([
           'twig_files' => $this->listTwigFiles(),
           'php_files' => $this->listPhpFiles(),
