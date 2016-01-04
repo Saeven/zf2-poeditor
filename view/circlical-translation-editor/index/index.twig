@@ -78,6 +78,13 @@
         border-color: #313335;
     }
 
+    small.prompt{
+        font-size:0.8em;
+        font-weight:200;
+        color: #df8a27;
+        padding-left:10px;
+    }
+
 </style>
 
     <div class="container" style="margin-bottom:50px;margin-top:15px;">
@@ -93,9 +100,26 @@
         <div role="tabpanel" class="tab-pane fade in active" id="files">
             <div class="container">
                 <div class="row">
+
+                    <div class="col-xs-12">
+                        <h2>Configuration <small class="prompt"> will be imprinted into the PO file</small></h2>
+                        <form style="margin-top:15px;">
+                            <div class="form-group">
+                                <label for="project_id">Project ID</label>
+                                <input type="text" class="form-control" name="project_id" id="project_id" placeholder="Enter project package and version">
+                            </div>
+                            <div class="form-group">
+                                <label for="report_msgid_bugs">Bug Contact</label>
+                                <input type="text" class="form-control" name="report_msgid_bugs" id="report_msgid_bugs" placeholder="Email to whom bugs should be reported">
+                            </div>
+                        </form>
+                    </div>
+
+                    <hr>
+
                     <div class="col-xs-12">
                         <div class="form-group">
-                            <h2>Scan Mode <small style="font-size:0.8em;font-weight:100;color:#CC7832;padding-left:10px;"> how will files be selected for translation?</small></h2>
+                            <h2>Scan Mode <small class="prompt"> how will files be selected for translation?</small></h2>
                         </div>
 
                         <div class="btn-group" data-toggle="buttons">
@@ -178,9 +202,7 @@
                     <button class="btn btn-primary" id="refresh_locale"><i class="fa fa-refresh"></i> Refresh</button>
                 </div>
             </div>
-            <div class="col-xs-12" style="padding-bottom:10px;">
-                <h2>Modules</h2>
-            </div>
+
             <div id="string_list">
 
 

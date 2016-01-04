@@ -101,8 +101,46 @@
         min-height:650px;
     }
 
+    p.help-block{
+        color:#BABABA;
+    }
+
+    .text-info{
+        color: #5C97BB;
+    }
+
 
 </style>
+
+
+    <div class="col-xs-12">
+        <h2>Language Configuration <small class="prompt"> will be imprinted into the PO file, required</small></h2>
+        <a href="https://www.gnu.org/software/gettext/manual/html_node/Header-Entry.html" class="text-info">specification at https://www.gnu.org/software/gettext/manual/html_node/Header-Entry.html</a>
+        <form id="language_config_form" style="margin-top:15px;">
+            <div class="form-group">
+                <label for="language_team">Language Team</label>
+                <input type="text" class="form-control" name="language_team" id="language_team" placeholder="English name of language followed by an email address or homepage, e.g., English language@corp.com" value="{{ language_team }}">
+            </div>
+            <div class="form-group">
+                <label for="charset">Charset</label>
+                <input type="text" class="form-control" name="charset" id="charset" placeholder="e.g., UTF-8" value="{{ charset }}">
+            </div>
+            <div class="form-group">
+                <label for="plural_forms">Plural Forms</label>
+                <textarea class="form-control" name="plural_forms" id="plural_forms" placeholder="Plural form specification, e.g., nplurals=2; plural=(n != 1);">{{ plural_forms }}</textarea>
+                <p class="help-block">
+                    See <a class="text-info" href="http://localization-guide.readthedocs.org/en/latest/l10n/pluralforms.html" target="_blank">this link</a> for a handy guide, and
+                    <a class="text-info" href="https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html#Plural-forms" target="_blank">this link</a> for the official spec.
+                </p>
+            </div>
+        </form>
+        <button id="config_save" class="btn btn-success"><i class="fa fa-hdd-o"></i> Save Configuration for <b>{{ locale }}</b></button>
+    </div>
+
+
+<div class="col-xs-12" style="padding-bottom:10px;padding-top:10px;">
+    <h2>Modules <small class="prompt"> click tabs to reveal msgid strings</small></h2>
+</div>
 
 <!-- Nav tabs -->
 <ul class="nav nav-tabs module-tabs" role="tablist">
@@ -176,6 +214,13 @@
 
 <script type="text/javascript">
 
+    $("button#config_save").click( function(){
+        $.post(
+            '/translate/save-language-config/' + $("select#locale_select").val(),
+            $("#language_config_form").serialize()
+        );
+    });
+
     $("button#save").click( function(){
 
         var translations = {};
@@ -207,7 +252,7 @@
             translations[module] = parts;
         });
 
-        $.ajax('/translate/save/' + locale, {
+        $.ajax('/translate/save/' + $("select#locale_select").val(), {
             data: JSON.stringify( translations ),
             type: 'POST',
             processData: false,

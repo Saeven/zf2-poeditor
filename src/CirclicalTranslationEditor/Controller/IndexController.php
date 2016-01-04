@@ -2,6 +2,7 @@
 
 namespace CirclicalTranslationEditor\Controller;
 
+use Circlical\PoEditor\HeaderBlock;
 use Circlical\PoEditor\PoEditor;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -52,7 +53,7 @@ class IndexController extends AbstractActionController
 
     /**
      * Fetch the entire translation.ini, or a part
-     * @return Config
+     * @return Config|string
      */
     private function getConfig( $section = null, $setting = null )
     {
@@ -370,7 +371,8 @@ class IndexController extends AbstractActionController
         $locale = preg_replace('/[^a-zA-Z_]/',"", $this->params()->fromPost('locale') );
 
         $vm->setTerminal(true);
-        $vm->setTemplate( 'circlical-translation-editor/index/editor' );
+        $vm->setTemplate('circlical-translation-editor/index/editor');
+        $vm->setVariable('locale', $locale);
 
         // discover eligible modules
         $files = $this->getSelectedFiles();
@@ -397,10 +399,45 @@ class IndexController extends AbstractActionController
             $module_entries[$m] = $editor->getBlocks();
         }
 
-        $vm->setVariable( 'module_entries', $module_entries );
+        $vm->setVariable('module_entries', $module_entries);
+
+	    $vm->setVariables([
+			'language_team' => $this->getConfig( 'language_config_' . $locale, 'language_team' ),
+	        'charset' => $this->getConfig( 'language_config_' . $locale, 'charset' ),
+	        'plural_forms' => $this->getConfig( 'language_config_' . $locale, 'plural_forms' ),
+	    ]);
 
         return $vm;
     }
+
+	/**
+	 * Save the language configuration.  This stuff ends up in the po file header.
+	 */
+	public function saveLanguageConfigAction()
+	{
+		$response = ['success' => false];
+
+		try
+		{
+			$accepted = [ 'language', 'charset', 'plural_forms' ];
+			$locale = preg_replace('/[^a-zA-Z_]/',"", $this->params()->fromRoute('locale') );
+
+			if( !$locale )
+				throw new \Exception( "Locale is required" );
+
+			foreach( $accepted as $k )
+				$this->setConfig( "language_config_{$locale}", $k, $this->params()->fromPost($k) );
+
+			$response['success'] = true;
+		}
+		catch( \Exception $x )
+		{
+			$response['message'] = $x->getMessage();
+		}
+
+		return new JsonModel($response);
+
+	}
 
 
     /**
@@ -455,8 +492,16 @@ class IndexController extends AbstractActionController
                     }
                 }
 
+	            /** @var HeaderBlock $header_block */
+                $header_block = $parser->getBlockWithKey("");
+				$header_block->setValue("Language-Team", $this->getConfig( 'language_config_' . $locale, 'language_team' ));
+                $header_block->setValue("Content-Type", "text/plain; charset=" . $this->getConfig( 'language_config_' . $locale, 'charset' ));
+                $header_block->setValue("Plural-Forms", $this->getConfig( 'language_config_' . $locale, 'plural_forms' ));
+
                 file_put_contents( $module_po_file, $parser->compile() );
-                shell_exec( $msgfmt . ' ' . $module_po_file . ' ' . $module_mo_file );
+                shell_exec( $msgfmt . ' ' . $module_po_file . ' -o ' . $module_mo_file );
+
+                $response['cmd'][] = $msgfmt . ' ' . $module_po_file . ' -o ' . $module_mo_file;
                 $response['success'] = true;
             }
 

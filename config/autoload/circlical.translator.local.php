@@ -15,7 +15,6 @@ return [
              */
             'msgcat' => '/usr/local/bin/msgcat',
 
-
             /*
              * The path to msgfmt on your local machine. Make sure this is installed, or it won't work
              */
@@ -30,7 +29,6 @@ return [
              * The path where cache and config are stored
              */
             'cache_dir' =>  getcwd() . '/data/cache/translator',
-
 
             /*
              * Custom stubs for Twig functions you might have created
@@ -49,7 +47,6 @@ return [
             'stub_filters' => [
                 'localizedcurrency',
             ],
-
 
             /*
              * You can configure a guard function to prevent this from being used in prod environments

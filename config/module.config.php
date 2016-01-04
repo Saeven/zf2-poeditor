@@ -48,6 +48,21 @@
                         ],
                     ],
                 ],
+
+                'circlical-translator-save-language-config' => [
+                    'type' => 'Segment',
+                    'options' => [
+                        'route' => '/translate/save-language-config/[:locale]',
+                        'defaults' => [
+                            'controller' => IndexController::class,
+                            'action' => 'save-language-config',
+                        ],
+                        'constraints' => [
+                            'locale' => '[a-zA-Z0-9_-]*',
+                        ],
+                    ],
+                ],
+
             ],
         ],
 
