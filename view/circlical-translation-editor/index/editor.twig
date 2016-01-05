@@ -156,7 +156,7 @@
     <div role="tabpanel" class="tab-pane fade module-translations" id="{{ module }}">
         <div class="tab-box">
 
-        {% for key, block in blocks %}
+        {% for key, block in blocks if block.getKey() != "" %}
             <div class="translation-group" data-key="{{ block.getKey() }}">
 
                 {# decorate the display if it is plural #}
@@ -164,9 +164,9 @@
                 {% if block.getMsgidPlural() %}
 
                     <div class="col-xs-12 keystring plural">
-                        {{ block.getMsgid()|join('<i class="fa fa-paragraph"></i><br/>')|raw }}
+                        {{ block.getMsgid()|join('<i class="fa fa-paragraph"></i><br/>') }}
                         <hr/>
-                        <i class="fa fa-plus"></i> {{ block.getMsgidPlural()|join('<i class="fa fa-paragraph"></i><br/>')|raw }}
+                        <i class="fa fa-plus"></i> {{ block.getMsgidPlural()|join('<i class="fa fa-paragraph"></i><br/>') }}
                     </div>
 
                     {# each plural form can be an array #}
@@ -181,11 +181,10 @@
                     </div>
                     {% endfor %}
 
-
                 {% else %}
 
                     <div class="col-xs-12 keystring">
-                        {{ block.getMsgid()|join('<i class="fa fa-paragraph"></i><br/>')|raw }}
+                        {{ block.getMsgid()|join('<i class="fa fa-paragraph"></i><br/>') }}
                     </div>
 
                     {% for id, msg in block.getMsgid() %}

@@ -218,7 +218,7 @@
 <script type="text/javascript">
 
     $.ajaxSetup({ cache: false });
-    
+
     var locale = '';
     var $string_list = $("#string_list");
 
@@ -249,6 +249,7 @@
     });
 
     function loadLocale( lc ){
+        $("#refresh_locale").prop('disabled',true);
         $.getJSON( '/translate/compile', { locale: lc }, function( j ){
             if(j.success){
                 $string_list.load( '/translate/get-editor', { locale: lc } );
@@ -256,6 +257,8 @@
             else{
                 $string_list.html("<h5 class='text-danger'>Yikes! Something blew up.</h5><div class='alert alert-danger' style='overflow:hidden;font-size:10px;'>" + j.message + "</div>");
             }
+        }).always( function(){
+            $("#refresh_locale").prop('disabled',false);
         });
     }
 
