@@ -49,6 +49,17 @@
                     ],
                 ],
 
+                'circlical-translator-save-config' => [
+                    'type' => 'Segment',
+                    'options' => [
+                        'route' => '/translate/save-config',
+                        'defaults' => [
+                            'controller' => IndexController::class,
+                            'action' => 'save-config',
+                        ],
+                    ],
+                ],
+
                 'circlical-translator-save-language-config' => [
                     'type' => 'Segment',
                     'options' => [

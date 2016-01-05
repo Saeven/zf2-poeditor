@@ -103,16 +103,22 @@
 
                     <div class="col-xs-12">
                         <h2>Configuration <small class="prompt"> will be imprinted into the PO file</small></h2>
-                        <form style="margin-top:15px;">
+                        <form style="margin-top:15px;" id="general_config">
                             <div class="form-group">
                                 <label for="project_id">Project ID</label>
-                                <input type="text" class="form-control" name="project_id" id="project_id" placeholder="Enter project package and version">
+                                <input type="text" class="form-control" name="project_id" id="project_id" placeholder="Enter project package and version" value="{{ project_id }}">
                             </div>
                             <div class="form-group">
                                 <label for="report_msgid_bugs">Bug Contact</label>
-                                <input type="text" class="form-control" name="report_msgid_bugs" id="report_msgid_bugs" placeholder="Email to whom bugs should be reported">
+                                <input type="text" class="form-control" name="report_msgid_bugs" id="report_msgid_bugs" placeholder="Email to whom bugs should be reported" value="{{ report_msgid_bugs }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="copyright">Copyright Notice</label>
+                                <textarea class="form-control" name="copyright" id="copyright" placeholder="Input copyright info here if you like.  It will get line wrapped at 80 chars.">{{ copyright }}</textarea>
                             </div>
                         </form>
+                        <button id="general_config_save" class="btn btn-success"><i class="fa fa-hdd-o"></i> Save Configuration</button>
+
                     </div>
 
                     <hr>
@@ -275,6 +281,13 @@
             $("#content_selective").hide();
             $("#content_automatic").show();
         }
-    })
+    });
+
+    $("button#general_config_save").click( function(){
+        $.post(
+            '/translate/save-config',
+            $("#general_config").serialize()
+        );
+    });
 
 </script>

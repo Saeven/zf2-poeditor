@@ -164,6 +164,12 @@ class IndexController extends AbstractActionController
           'checked' => $this->getSelectedFiles(true),
         ]);
 
+        $vm->setVariables([
+			'project_id' => $this->getConfig( 'config', 'project_id' ),
+	        'report_msgid_bugs' => $this->getConfig( 'config', 'report_msgid_bugs' ),
+	        'copyright' => $this->getConfig( 'config', 'copyright' ),
+	    ]);
+
         return $vm;
     }
 
@@ -436,8 +442,27 @@ class IndexController extends AbstractActionController
 		}
 
 		return new JsonModel($response);
-
 	}
+
+    public function saveConfigAction()
+    {
+        $response = ['success' => false];
+
+		try
+		{
+			$accepted = [ 'project_id', 'report_msgid_bugs', 'copyright' ];
+			foreach( $accepted as $k )
+				$this->setConfig( "config", $k, $this->params()->fromPost($k) );
+
+			$response['success'] = true;
+		}
+		catch( \Exception $x )
+		{
+			$response['message'] = $x->getMessage();
+		}
+
+		return new JsonModel($response);
+    }
 
 
     /**
