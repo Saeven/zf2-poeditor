@@ -419,7 +419,7 @@ class IndexController extends AbstractActionController
 
 		try
 		{
-			$accepted = [ 'language', 'charset', 'plural_forms' ];
+			$accepted = [ 'language_team', 'charset', 'plural_forms' ];
 			$locale = preg_replace('/[^a-zA-Z_]/',"", $this->params()->fromRoute('locale') );
 
 			if( !$locale )
