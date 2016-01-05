@@ -164,9 +164,14 @@
                 {% if block.getMsgidPlural() %}
 
                     <div class="col-xs-12 keystring plural">
-                        {{ block.getMsgid()|join('<i class="fa fa-paragraph"></i><br/>') }}
+                        {% for msgid_part in block.getMsgid() %}
+                            {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
+                        {% endfor %}
                         <hr/>
-                        <i class="fa fa-plus"></i> {{ block.getMsgidPlural()|join('<i class="fa fa-paragraph"></i><br/>') }}
+                        <i class="fa fa-plus"></i>
+                        {% for msgid_part in block.getMsgidPlural() %}
+                            {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
+                        {% endfor %}
                     </div>
 
                     {# each plural form can be an array #}
@@ -184,7 +189,9 @@
                 {% else %}
 
                     <div class="col-xs-12 keystring">
-                        {{ block.getMsgid()|join('<i class="fa fa-paragraph"></i><br/>') }}
+                        {% for msgid_part in block.getMsgid() %}
+                            {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
+                        {% endfor %}
                     </div>
 
                     {% for id, msg in block.getMsgid() %}
