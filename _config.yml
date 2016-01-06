@@ -1,19 +1,19 @@
 # Site settings
-title:
-email:
+title: Zend Framework 2 Translations Editor
+email: alemaire@circlical.com
 description: > # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  Tired of pulling your hair over PoEdit?  Using Twig and PHP?
+  Welcome to the promised land.  Set this module up to supercharge
+  your translations today.
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "" # the base hostname & protocol for your site
 
 # User setting
-owner:
-email:
-facebook_username:
-twitter_username:
-github_username:
+owner: Alex
+email: alemaire@circlical.com
+facebook_username: Saeven
+twitter_username: Saeven
+github_username: Saeven
 address:
   - line:
   - line:
