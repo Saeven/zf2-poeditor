@@ -154,12 +154,14 @@ hr.small {
     display: table;
     position: relative;
     width: 100%;
-    height: 100%;
-    background: url(../img/bg.jpg) no-repeat center center scroll;
+    height: 80%;
+    background: url(../img/peeps.jpg) no-repeat center center scroll;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
     -o-background-size: cover;
+    color:white;
+    text-shadow: 0px 2px 3px #333;
 }
 
 /* About */
@@ -183,9 +185,10 @@ hr.small {
 .callout {
     display: table;
     width: 100%;
-    height: 400px;
-    color: #fff;
-    background: url(../img/callout.jpg) no-repeat center center scroll;
+    height: 300px;
+    color:white;
+    text-shadow: 0px 2px 3px #555;
+    background: url(../img/monkey.jpg) no-repeat center center scroll;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
