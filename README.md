@@ -34,6 +34,18 @@ To install the packages:
 
     composer require saeven/zf2-poeditor
 
+Then add these modules to your ZF2 application config:
+
+    CirclicalTranslationEditor
+
+Access <yourapp>/translate to confirm that it's set up.  If you don't have a Twig/Trans bridge in there already, you
+can also load
+
+    CirclicalTwigTrans
+
+To gain {% trans %} for Twig
+
+
 You have to make sure that you have gettext installed as well.  Check your system with these commands:
 
     which msgfmt
@@ -42,6 +54,8 @@ You have to make sure that you have gettext installed as well.  Check your syste
     which msguniq
 
 If they all exist, you are in business. Otherwise, Google how to get gettext binaries installed on your system.
+
+
 
 
 ## Configuration
@@ -86,6 +100,40 @@ Twig files, there's a `{{ GrilledCheese }}` that's causing the problem.  To fix 
 * Click refresh inside the translator
 
 Filters work similarly, the error message will guide you properly.
+
+
+## Some Instructions!
+
+
+#### Locale Discovery
+**Locale discovery** depends on the proper set up of gettext message folders within your modules.  These would like like:
+
+> module/Application/language/en_US/LC_MESSAGES
+> module/Application/language/fr_CA/LC_MESSAGES
+
+You'll have to set these up or there'll be no locales in the dropdown within the translator.
+
+
+#### Scan Mode
+The system scans your module folders only, for PHP and Twig files.
+
+
+#### Compile Trigger
+The pot files are compiled when you select a locale.
+
+#### Configuration Required!
+If you don't configure the languages that you work on, then you won't get the right PO headers in place.  If this happens, then compilation from po to mo is not possible.
+Be sure to configure your file with the language team, charset, and plural form for your language.
+
+#### Sanity Check
+
+You can check your ./data/cache/translator folder for these files while you're working.  Their presence lets you know things should be working:
+
+* *.php.pot
+* *.pot
+* translator.ini
+
+
 
 
 ## Contributing
