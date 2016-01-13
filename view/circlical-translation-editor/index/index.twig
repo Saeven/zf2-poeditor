@@ -258,7 +258,9 @@
         $("#refresh_locale").prop('disabled',true);
         $.getJSON( '/translate/compile', { locale: lc }, function( j ){
             if(j.success){
-                $string_list.load( '/translate/get-editor', { locale: lc } );
+                $string_list.load( '/translate/get-editor', { locale: lc }, function(){
+                   showModuleView();
+                });
             }
             else{
                 $string_list.html("<h5 class='text-danger'>Yikes! Something blew up.</h5><div class='alert alert-danger' style='overflow:hidden;font-size:10px;'>" + j.message + "</div>");
@@ -266,6 +268,15 @@
         }).always( function(){
             $("#refresh_locale").prop('disabled',false);
         });
+    }
+
+    function showModuleView(){
+        if( $("#charset").val().length && $("#plural_forms").val().length ){
+            $("#modules_view").fadeIn();
+        }
+        else{
+            $("#modules_require_configuration").fadeIn();
+        }
     }
 
     $("input[name='scan_mode']").change(function(){

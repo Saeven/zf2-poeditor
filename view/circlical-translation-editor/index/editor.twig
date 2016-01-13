@@ -109,128 +109,136 @@
         color: #5C97BB;
     }
 
+    #modules_view, #modules_require_configuration{
+        display:none;
+    }
+
 
 </style>
 
 
-    <div class="col-xs-12">
-        <h2>Language Configuration <small class="prompt"> will be imprinted into the PO file, required</small></h2>
-        <a href="https://www.gnu.org/software/gettext/manual/html_node/Header-Entry.html" class="text-info">specification at https://www.gnu.org/software/gettext/manual/html_node/Header-Entry.html</a>
-        <form id="language_config_form" style="margin-top:15px;">
-            <div class="form-group">
-                <label for="language_team">Language Team</label>
-                <input type="text" class="form-control" name="language_team" id="language_team" placeholder="English name of language followed by an email address or homepage, e.g., English language@corp.com" value="{{ language_team }}">
-            </div>
-            <div class="form-group">
-                <label for="charset">Charset</label>
-                <input type="text" class="form-control" name="charset" id="charset" placeholder="e.g., UTF-8" value="{{ charset }}">
-            </div>
-            <div class="form-group">
-                <label for="plural_forms">Plural Forms</label>
-                <textarea class="form-control" name="plural_forms" id="plural_forms" placeholder="Plural form specification, e.g., nplurals=2; plural=(n != 1);">{{ plural_forms }}</textarea>
-                <p class="help-block">
-                    See <a class="text-info" href="http://localization-guide.readthedocs.org/en/latest/l10n/pluralforms.html" target="_blank">this link</a> for a handy guide, and
-                    <a class="text-info" href="https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html#Plural-forms" target="_blank">this link</a> for the official spec.
-                </p>
-            </div>
-        </form>
-        <button id="config_save" class="btn btn-success"><i class="fa fa-hdd-o"></i> Save Configuration for <b>{{ locale }}</b></button>
-    </div>
-
-
-<div class="col-xs-12" style="padding-bottom:10px;padding-top:10px;">
-    <h2>Modules <small class="prompt"> click tabs to reveal msgid strings</small></h2>
-</div>
-
-<!-- Nav tabs -->
-<ul class="nav nav-tabs module-tabs" role="tablist">
-{% for module, pofile in module_entries %}
-    <li role="presentation"><a href="#{{ module }}" role="tab" data-toggle="tab"><i class="fa fa-file-code-o"></i> {{ module }}</a></li>
-{% endfor %}
-</ul>
-
-
-<div class="tab-content trans_tabs">
-{% for module, blocks in module_entries %}
-    <!-- Tab panes -->
-    <div role="tabpanel" class="tab-pane fade module-translations" id="{{ module }}">
-        <div class="tab-box">
-
-        {% for key, block in blocks if block.getKey() != "" %}
-            <div class="translation-group" data-key="{{ block.getKey() }}">
-
-                {# decorate the display if it is plural #}
-
-                {% if block.getMsgidPlural() %}
-
-                    <div class="col-xs-12 keystring plural">
-                        {% for msgid_part in block.getMsgid() %}
-                            {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
-                        {% endfor %}
-                        <hr/>
-                        <i class="fa fa-plus"></i>
-                        {% for msgid_part in block.getMsgidPlural() %}
-                            {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
-                        {% endfor %}
-                    </div>
-
-                    {# each plural form can be an array #}
-                    {% for plural_form, lines in block.getMsgstrPlural() %}
-                    <div class="form-group plural">
-                        <label>msgstr[{{ plural_form }}]</label>
-                        {% for s in lines %}
-                        <div class="buffer">
-                            <input class="form-control transfield" type="text" data-plural="1" data-id="{{ plural_form }}" value="{{ s }}">
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% endfor %}
-
-                {% else %}
-
-                    <div class="col-xs-12 keystring">
-                        {% for msgid_part in block.getMsgid() %}
-                            {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
-                        {% endfor %}
-                    </div>
-
-                    {% for id, msg in block.getMsgid() %}
-                        <div class="form-group singular">
-                            <label><span class="key">{{ id }}</span> <i class="fa fa-caret-right"></i>
-                                {{ msg }}
-                            </label>
-                            <div class="buffer">
-                                <input class="form-control transfield" type="text" data-plural="0" data-id="{{ id }}" value="{{ block.getMsgstr()[id] }}">
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-            </div>
-        {% endfor %}
-
+<div class="col-xs-12">
+    <h2>Language Configuration <small class="prompt"> will be imprinted into the PO file, required</small></h2>
+    <a href="https://www.gnu.org/software/gettext/manual/html_node/Header-Entry.html" class="text-info">specification at https://www.gnu.org/software/gettext/manual/html_node/Header-Entry.html</a>
+    <form id="language_config_form" style="margin-top:15px;">
+        <div class="form-group">
+            <label for="language_team">Language Team</label>
+            <input type="text" class="form-control" name="language_team" id="language_team" placeholder="English name of language followed by an email address or homepage, e.g., English language@corp.com" value="{{ language_team }}">
         </div>
-    </div>
-{% endfor %}
+        <div class="form-group">
+            <label for="charset">Charset</label>
+            <input type="text" class="form-control" name="charset" id="charset" placeholder="e.g., UTF-8" value="{{ charset }}">
+        </div>
+        <div class="form-group">
+            <label for="plural_forms">Plural Forms</label>
+            <textarea class="form-control" name="plural_forms" id="plural_forms" placeholder="Plural form specification, e.g., nplurals=2; plural=(n != 1);">{{ plural_forms }}</textarea>
+            <p class="help-block">
+                See <a class="text-info" href="http://localization-guide.readthedocs.org/en/latest/l10n/pluralforms.html" target="_blank">this link</a> for a handy guide, and
+                <a class="text-info" href="https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html#Plural-forms" target="_blank">this link</a> for the official spec.
+            </p>
+        </div>
+    </form>
+    <button id="config_save" class="btn btn-success"><i class="fa fa-hdd-o"></i> Save Configuration for <b>{{ locale }}</b></button>
 </div>
 
-<div class="editor_actions">
-    <button class="btn btn-success pull-right" id="save"><i class="fa fa-hdd-o"></i> Save Translations</button>
+<div id="modules_require_configuration">
+    <div class="col-xs-12" style="padding-bottom:10px;padding-top:10px;">
+        <h2><small class="prompt" style="padding-left:0;">Please complete the language configuration to view module contents.</small></h2>
+    </div>
+</div>
+
+<div id="modules_view">
+    <div class="col-xs-12" style="padding-bottom:10px;padding-top:10px;">
+        <h2>Modules <small class="prompt"> click tabs to reveal msgid strings</small></h2>
+    </div>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs module-tabs" role="tablist">
+    {% for module, pofile in module_entries %}
+        <li role="presentation"><a href="#{{ module }}" role="tab" data-toggle="tab"><i class="fa fa-file-code-o"></i> {{ module }}</a></li>
+    {% endfor %}
+    </ul>
+
+
+    <div class="tab-content trans_tabs">
+    {% for module, blocks in module_entries %}
+        <!-- Tab panes -->
+        <div role="tabpanel" class="tab-pane fade module-translations" id="{{ module }}">
+            <div class="tab-box">
+
+            {% for key, block in blocks if block.getKey() != "" %}
+                <div class="translation-group" data-key="{{ block.getKey() }}">
+
+                    {# decorate the display if it is plural #}
+
+                    {% if block.getMsgidPlural() %}
+
+                        <div class="col-xs-12 keystring plural">
+                            {% for msgid_part in block.getMsgid() %}
+                                {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
+                            {% endfor %}
+                            <hr/>
+                            <i class="fa fa-plus"></i>
+                            {% for msgid_part in block.getMsgidPlural() %}
+                                {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
+                            {% endfor %}
+                        </div>
+
+                        {# each plural form can be an array #}
+                        {% for plural_form, lines in block.getMsgstrPlural() %}
+                        <div class="form-group plural">
+                            <label>msgstr[{{ plural_form }}]</label>
+                            {% for s in lines %}
+                            <div class="buffer">
+                                <input class="form-control transfield" type="text" data-plural="1" data-id="{{ plural_form }}" value="{{ s }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="col-xs-12 keystring">
+                            {% for msgid_part in block.getMsgid() %}
+                                {{ msgid_part }}{% if not loop.last %}<i class="fa fa-paragraph"></i><br/>{% endif %}
+                            {% endfor %}
+                        </div>
+
+                        {% for id, msg in block.getMsgid() %}
+                            <div class="form-group singular">
+                                <label><span class="key">{{ id }}</span> <i class="fa fa-caret-right"></i>
+                                    {{ msg }}
+                                </label>
+                                <div class="buffer">
+                                    <input class="form-control transfield" type="text" data-plural="0" data-id="{{ id }}" value="{{ block.getMsgstr()[id] }}">
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+    <div class="editor_actions">
+        <button class="btn btn-success pull-right" id="save"><i class="fa fa-hdd-o"></i> Save Translations</button>
+    </div>
 </div>
 
 <script type="text/javascript">
 
     $("button#config_save").click( function(){
-        $.post(
-            '/translate/save-language-config/' + $("select#locale_select").val(),
-            $("#language_config_form").serialize()
-        );
+        $.post( '/translate/save-language-config/' + $("select#locale_select").val(), $("#language_config_form").serialize(), function(){
+            showModuleView();
+        });
     });
 
     $("button#save").click( function(){
-
         var translations = {};
-
         $(".module-translations").each( function(){
             var module = $(this).attr('id'),
                 parts  = {};
