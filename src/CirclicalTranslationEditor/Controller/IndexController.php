@@ -295,7 +295,7 @@ class IndexController extends AbstractActionController
 			            ) .
 			            '--files ' . implode( " ", $list['twig'] );
 
-		            $ret = shell_exec( $cmd );
+		            $ret = shell_exec( $cmd . ' 2>&1' );
 		            if( strlen( $ret ) )
 			            throw new \Exception( $ret );
 
