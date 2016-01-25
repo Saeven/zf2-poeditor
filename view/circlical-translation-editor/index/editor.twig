@@ -241,26 +241,28 @@
         var translations = {};
         $(".module-translations").each( function(){
             var module = $(this).attr('id'),
-                parts  = {};
+                parts  = [];
 
             $(this).find(".translation-group").each( function(){
                 var $t = $(this),
-                    key = $t.attr('data-key'),
-                    strings = { singular: [], plural: {} };
+                    o = JSON.parse( $t.attr('data-key') );
+
+                o.singular = [];
+                o.plural = {};
 
                 $(this).find('.singular').each( function(){
                     $(this).find( 'input.transfield').each( function(){
-                        strings['singular'].push( $(this).val() );
+                        o.singular.push( $(this).val() );
                     });
                 });
 
                 $(this).find('.plural').each( function(){
                     $(this).find( 'input.transfield').each( function(){
-                        strings['plural'][$(this).attr('data-id')] = $(this).val();
+                        o['plural'][$(this).attr('data-id')] = $(this).val();
                     });
                 });
 
-                parts[key] = strings;
+                parts.push( o );
             });
 
             translations[module] = parts;

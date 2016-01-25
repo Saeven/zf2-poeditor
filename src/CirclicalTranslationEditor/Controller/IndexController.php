@@ -317,7 +317,8 @@ class IndexController extends AbstractActionController
 		            $mergelist[] = $module_php_pot;
 	            }
 
-	            $ret = shell_exec( $msgcat . " --use-first " . implode( " ", $mergelist ) . " > $final_pot" );
+	            // merge the two files into a final POT file
+	            shell_exec( $msgcat . " --use-first " . implode( " ", $mergelist ) . " > $final_pot" );
             }
 
             // then, backup the old files
@@ -492,6 +493,9 @@ class IndexController extends AbstractActionController
 
             $data = $this->getRequest()->getContent();
             $json = json_decode( $data, true );
+
+
+
             foreach( array_keys( $json ) as $module )
             {
                 $module_po_file = getcwd() . '/module/' . $module . '/language/' . $locale . '/LC_MESSAGES/default.po';
@@ -500,21 +504,27 @@ class IndexController extends AbstractActionController
                 $parser = new PoEditor( $module_po_file );
                 $parser->parse();
 
-                foreach( $json[$module] as $k => $v )
+                foreach( $json[$module] as $v )
                 {
-                    $key = rawurldecode( $k );
-                    $block = $parser->getBlockWithKey( $key );
+	                $key = json_encode([ 'context' => $v['context'], 'id' => $v['id'] ]);
 
-                    if( !empty( $v['singular'] ) )
+                    if( $block = $parser->getBlockWithKey( $key ) )
                     {
-                        $block->setMsgstr( $v['singular'] );
-                    }
+	                    if( !empty($v['singular']) )
+	                    {
+		                    $block->setMsgstr( $v['singular'] );
+	                    }
 
-                    if( !empty( $v['plural'] ) )
-                    {
-                        foreach( $v['plural'] as $form => $string )
-                            $block->setPluralForm( $form, $string );
+	                    if( !empty($v['plural']) )
+	                    {
+		                    foreach( $v['plural'] as $form => $string )
+			                    $block->setPluralForm( $form, $string );
+	                    }
                     }
+	                else
+	                {
+		                throw new \Exception( "The editor no longer matches the code?  This block couldn't be found anymore!\n" .  $v['id'] );
+	                }
                 }
 
 	            /** @var HeaderBlock $header_block */
@@ -526,7 +536,7 @@ class IndexController extends AbstractActionController
                 file_put_contents( $module_po_file, $parser->compile() );
                 shell_exec( $msgfmt . ' ' . $module_po_file . ' -o ' . $module_mo_file );
 
-                $response['cmd'][] = $msgfmt . ' ' . $module_po_file . ' -o ' . $module_mo_file;
+                $response['cmd'][$module] = $msgfmt . ' ' . $module_po_file . ' -o ' . $module_mo_file;
                 $response['success'] = true;
             }
 
