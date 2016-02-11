@@ -532,6 +532,7 @@ class IndexController extends AbstractActionController
 				$header_block->setValue("Language-Team", $this->getConfig( 'language_config_' . $locale, 'language_team' ));
                 $header_block->setValue("Content-Type", "text/plain; charset=" . $this->getConfig( 'language_config_' . $locale, 'charset' ));
                 $header_block->setValue("Plural-Forms", $this->getConfig( 'language_config_' . $locale, 'plural_forms' ));
+                $header_block->setValue("Language", $locale );
 
                 file_put_contents( $module_po_file, $parser->compile() );
                 shell_exec( $msgfmt . ' ' . $module_po_file . ' -o ' . $module_mo_file );
