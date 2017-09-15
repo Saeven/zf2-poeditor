@@ -1,0 +1,16 @@
+/vendor/
+composer.phar
+.idea/
+.sass-cache
+data/DoctrineORMModule
+data/cache/*
+public/coverage
+node_modules/
+*.un~
+build
+.DS_Store
+tags
+phpspec-dev.yml
+build/
+.docker-sync
+*.css.map
