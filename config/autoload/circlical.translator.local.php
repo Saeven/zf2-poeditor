@@ -23,12 +23,12 @@ return [
             /*
              * The folder where existing po files are backed up, just in case
              */
-            'backup_dir' =>  getcwd() . '/data/cache/translator/backups',
+            'backup_dir' => getcwd() . '/data/cache/translator/backups',
 
             /*
              * The path where cache and config are stored
              */
-            'cache_dir' =>  getcwd() . '/data/cache/translator',
+            'cache_dir' => getcwd() . '/data/cache/translator',
 
             /*
              * Custom stubs for Twig functions you might have created

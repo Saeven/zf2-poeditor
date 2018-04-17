@@ -19,6 +19,14 @@ class IndexController extends AbstractActionController
     const SCAN_SELECTIVE = 'scan_selective';
     const SCAN_ALL = 'scan_all';
 
+    private $config;
+
+
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+    }
+
     /**
      * Save a setting into translation.ini
      *
@@ -37,13 +45,15 @@ class IndexController extends AbstractActionController
         else
             $cfg->$section = $value;
 
-        $config = $this->getServiceLocator()->get('config');
-        $config = $config['circlical']['translation_editor'];
+
+        $config = $this->config['circlical']['translation_editor'];
         $cache_dir = $config['cache_dir'];
         $translator_config = $cache_dir . '/translator.ini';
 
         if (!file_exists($translator_config)) {
-            @mkdir(dirname($translator_config), 0755, true);
+            if (!mkdir(dirname($translator_config), 0755, true) && !is_dir(dirname($translator_config))) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', dirname($translator_config)));
+            }
             @touch($translator_config);
         }
 
@@ -57,8 +67,7 @@ class IndexController extends AbstractActionController
      */
     private function getConfig($section = null, $setting = null)
     {
-        $config = $this->getServiceLocator()->get('config');
-        $config = $config['circlical']['translation_editor'];
+        $config = $this->config['circlical']['translation_editor'];
         $cache_dir = $config['cache_dir'];
         $translator_config = $cache_dir . '/translator.ini';
         $params = [];
@@ -137,9 +146,8 @@ class IndexController extends AbstractActionController
      */
     public function onDispatch(MvcEvent $e)
     {
-        $config = $this->getServiceLocator()->get('config');
-        $config = $config['circlical']['translation_editor'];
-        if (!empty($config['guard']) && is_callable($config['guard'])) {
+        $config = $this->config['circlical']['translation_editor'];
+        if (!empty($config['guard']) && \is_callable($config['guard'])) {
             $config['guard']();
         }
         parent::onDispatch($e);
@@ -192,7 +200,6 @@ class IndexController extends AbstractActionController
     public function setAction()
     {
         $response = ['success' => false];
-        $sm = $this->getServiceLocator();
 
         try {
             $params = $this->params();
@@ -221,8 +228,7 @@ class IndexController extends AbstractActionController
                 throw new \Exception("Locale is required!");
             }
 
-            $config = $this->getServiceLocator()->get('config');
-            $config = $config['circlical']['translation_editor'];
+            $config = $this->config['circlical']['translation_editor'];
             $xgettext = $config['xgettext'];
             $msgcat = $config['msgcat'];
             $backup_dir = $config['backup_dir'];
@@ -451,9 +457,8 @@ class IndexController extends AbstractActionController
         $response['success'] = false;
         $locale = preg_replace('/[^a-zA-Z_]/', "", $this->params()->fromRoute('locale'));
 
-        $config = $this->getServiceLocator()->get('config');
-        $config = $config['circlical']['translation_editor'];
-        $msgfmt = $config['msgfmt'];
+
+        $msgfmt = $this->config['msgfmt'];
 
         try {
             if (!$this->getRequest()->isPost()) {
