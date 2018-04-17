@@ -3,6 +3,7 @@
 namespace CirclicalTranslationEditor;
 
 use CirclicalTranslationEditor\Controller\IndexController;
+use CirclicalTranslationEditor\Factory\Controller\IndexControllerFactory;
 
 
 return [
@@ -92,8 +93,8 @@ return [
     ],
 
     'controllers' => [
-        'invokables' => [
-            IndexController::class => IndexController::class,
+        'factories' => [
+            IndexController::class => IndexControllerFactory::class,
         ],
     ],
 
