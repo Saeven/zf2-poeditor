@@ -456,9 +456,7 @@ class IndexController extends AbstractActionController
     {
         $response['success'] = false;
         $locale = preg_replace('/[^a-zA-Z_]/', "", $this->params()->fromRoute('locale'));
-
-
-        $msgfmt = $this->config['msgfmt'];
+        $msgfmt = $this->config['circlical']['translation_editor']['msgfmt'];
 
         try {
             if (!$this->getRequest()->isPost()) {
